@@ -2,6 +2,7 @@ package cn.sdkd.ccse.cise.ces.similarity;
 
 
 import cn.sdkd.ccse.cise.ces.pojo.Similarity;
+import cn.sdkd.ccse.cise.ces.pojo.SimilarityPair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public abstract class SimilarityService implements Callable<Similarity>{
 	 * @return
 	 */
 	public abstract List<Similarity> analyseSimilarity(List<HashMap<String, ArrayList<String>>> list);
-	public abstract List<Similarity> analyseSimilaritySingleThread(List<HashMap<String, ArrayList<String>>> list);
+	public abstract List<SimilarityPair> analyseSimilaritySingleThread(List<HashMap<String, ArrayList<String>>> list);
 	public abstract Similarity analyse(List<HashMap<String,ArrayList<String>>> list,HashMap<String,ArrayList<String>> currentStu);
 	
 	/**

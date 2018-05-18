@@ -2,6 +2,7 @@ package cn.sdkd.ccse.cise.ces.similarity;
 
 
 import cn.sdkd.ccse.cise.ces.pojo.Similarity;
+import cn.sdkd.ccse.cise.ces.pojo.SimilarityPair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class CosineSimilarityService extends SimilarityService {
 		return res;
 	}
 
-	public List<Similarity> analyseSimilaritySingleThread(List<HashMap<String, ArrayList<String>>> list) {
+	public List<SimilarityPair> analyseSimilaritySingleThread(List<HashMap<String, ArrayList<String>>> list) {
 		return null;
 	}
 

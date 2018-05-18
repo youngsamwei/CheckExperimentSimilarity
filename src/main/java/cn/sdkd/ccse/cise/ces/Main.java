@@ -1,6 +1,7 @@
 package cn.sdkd.ccse.cise.ces;
 
 import cn.sdkd.ccse.cise.ces.pojo.Similarity;
+import cn.sdkd.ccse.cise.ces.pojo.SimilarityPair;
 import cn.sdkd.ccse.cise.ces.similarity.ServiceFacade;
 import cn.sdkd.ccse.cise.ces.similarity.SimilarityFactory;
 import cn.sdkd.ccse.cise.ces.similarity.SimilarityService;
@@ -38,7 +39,7 @@ public class Main {
         //获取相似度实例
         SimilarityService simiService = SimilarityFactory.getSimiralityType(type);
         //多线程分析相似度
-        List<Similarity> res = simiService.analyseSimilaritySingleThread(resList);
+        List<SimilarityPair> res = simiService.analyseSimilaritySingleThread(resList);
         LOGGER.info("-------分析相似度结束-------");
     }
 
@@ -63,7 +64,7 @@ public class Main {
         //获取相似度实例
         SimilarityService simiService = SimilarityFactory.getSimiralityType(type);
         //多线程分析相似度
-        List<Similarity> res = simiService.analyseSimilaritySingleThread(resList);
+        List<SimilarityPair> res = simiService.analyseSimilaritySingleThread(resList);
         LOGGER.info("-------分析相似度结束-------");
     }
     public static void main(String[] args) {

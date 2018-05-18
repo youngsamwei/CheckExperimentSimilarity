@@ -2,6 +2,7 @@ package cn.sdkd.ccse.cise.ces.similarity;
 
 
 import cn.sdkd.ccse.cise.ces.pojo.Similarity;
+import cn.sdkd.ccse.cise.ces.pojo.SimilarityPair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class CommonWordSimilarityService extends SimilarityService{
 		this.currentStu = currentStu;
 	}
 
-	public List<Similarity> analyseSimilaritySingleThread(List<HashMap<String,ArrayList<String>>> list){
+	public List<SimilarityPair> analyseSimilaritySingleThread(List<HashMap<String,ArrayList<String>>> list){
+		List<SimilarityPair> r = new ArrayList<SimilarityPair>();
 		List<Similarity> resList = new ArrayList<Similarity>();
 		//多线程计算相似度
 		for(int i=0;i<list.size();i++){
@@ -51,7 +53,7 @@ public class CommonWordSimilarityService extends SimilarityService{
 			}
 		}
 		System.out.println("整理格式完成");
-		return res;
+		return r;
 	}
 	/**
 	 * 分析重复率
