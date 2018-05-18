@@ -1,10 +1,12 @@
 package cn.sdkd.ccse.cise.ces.similarity;
 
 
+import cn.sdkd.ccse.cise.ces.pdf.PDF;
 import cn.sdkd.ccse.cise.ces.word.WordResource;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.*;
@@ -32,18 +34,34 @@ public class ServiceFacade {
         for (int i = 0; i < files.length; i++) {
             //先获取word文档的内容
             //开启多线程，获取文字
-            String name = files[i].getName();
-            if (name.endsWith(".pdf") || name.endsWith(".zip"))
+            String name = files[i].getName().toLowerCase();
+            if (name.endsWith(".doc") || name.endsWith(".docx")) {
+                WordResource wr = new WordResource();
+                try {
+                    String text = wr.getText(files[i].getAbsolutePath());
+                    WordSegService ss = new WordSegService();
+                    HashMap<String, ArrayList<String>> map = ss.getAnalysis(text.split("#_#")[1], text.split("#_#")[0]);
+                    resList.add(map);
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            } else if (name.endsWith(".pdf")) {
+                PDF pdf = new PDF();
+                HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>> ();
+                try {
+                    String content = pdf.readPDFText(files[i].getAbsolutePath());
+
+                    WordSegService ss = new WordSegService();
+                    map = ss.getAnalysis(content, name);
+                    resList.add(map);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            } else {
+                logger.error("不支持的文件类型 : " + name);
                 continue;
-            WordResource wr = new WordResource();
-            try {
-                String text = wr.getText(files[i].getAbsolutePath());
-                WordSegService ss = new WordSegService();
-                HashMap<String, ArrayList<String>> map = ss.getAnalysis(text.split("#_#")[1], text.split("#_#")[0]);
-                resList.add(map);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+
         }
     }
 

@@ -41,11 +41,13 @@ public class Main {
         List<Similarity> res = simiService.analyseSimilaritySingleThread(resList);
         LOGGER.info("-------分析相似度结束-------");
     }
-    /* 获取文本 */
-    /* 计算相似度 */
-    /* 输出结果*/
-    public static void checkExperimentSimilaritySingleThread(String dirRealPath) {
-        byte type = 0;
+
+    /**
+     *
+     * @param dirRealPath 文件目录
+     * @param type 算法类型：0共有词汇，1cos相似度，2simhash
+     */
+    public static void checkExperimentSimilaritySingleThread(String dirRealPath, byte type) {
 
         File file = new File(dirRealPath);
         File[] files = file.listFiles();
@@ -67,7 +69,9 @@ public class Main {
     public static void main(String[] args) {
         String path = "E:\\IntelliJ_IDEA_workspace\\check-similarity\\src\\main\\webapp\\files\\ThuMay17100709CST2018";
         path = "G:\\360云盘工作目录\\计算机同步文件夹\\工作目录\\教学\\数据库设计\\计算机15数据库设计实验\\实验0 数据库任务陈述与系统定义";
-        checkExperimentSimilaritySingleThread(path);
+        byte type = 2;
+
+        checkExperimentSimilaritySingleThread(path, type);
 //        checkExperimentSimilarity(path);
     }
 }
