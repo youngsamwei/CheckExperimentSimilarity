@@ -15,7 +15,7 @@ import java.util.Map;
 public class SimHash {
     private String tokens; //字符串
     private BigInteger strSimHash;//字符产的hash值
-    private int hashbits = 64; // 分词后的hash数;
+    private static  int hashbits = 64; // 分词后的hash数;
     private ArrayList<String> arrTokens;
 
     public SimHash(String tokens) {
@@ -81,17 +81,21 @@ public class SimHash {
         }
         return fingerprint;
     }
+
+    public BigInteger simHash(){
+        return simHash(tokens);
+    }
     /**
      * 这个是对整个字符串进行hash计算
      * @return
      */
-    private BigInteger simHash() {
+    private BigInteger simHash(String source) {
 
-        tokens = cleanResume(tokens); // cleanResume 删除一些特殊字符
+        source = cleanResume(source); // cleanResume 删除一些特殊字符
 
         int[] v = new int[this.hashbits];
 
-        List<Term> termList = StandardTokenizer.segment(this.tokens); // 对字符串进行分词
+        List<Term> termList = StandardTokenizer.segment(source); // 对字符串进行分词
 
         //对分词的一些特殊处理 : 比如: 根据词性添加权重 , 过滤掉标点符号 , 过滤超频词汇等;
         Map<String, Integer> weightOfNature = new HashMap<String, Integer>(); // 词性的权重
@@ -202,6 +206,27 @@ public class SimHash {
     public double getSemblance(SimHash s2 ){
         double i = (double) this.hammingDistance(s2);
         return 1 - i/this.hashbits ;
+    }
+
+    public static double gtSemblance(BigInteger simhash1, BigInteger simhash2){
+        double i = (double) hammingDistance(simhash1, simhash2);
+        return 1 - i/hashbits ;
+    }
+
+    private static int hammingDistance(BigInteger simhash1, BigInteger simhash2){
+        BigInteger m = new BigInteger("1").shiftLeft(hashbits).subtract(
+                new BigInteger("1"));
+        BigInteger x = simhash1.xor(simhash2).and(m);
+        int tot = 0;
+        while (x.signum() != 0) {
+            tot += 1;
+            x = x.and(x.subtract(new BigInteger("1")));
+        }
+        return tot;
+    }
+
+    public BigInteger getStrSimHash() {
+        return strSimHash;
     }
 
     public static void main(String[] args) {

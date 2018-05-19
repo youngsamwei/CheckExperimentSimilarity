@@ -1,5 +1,7 @@
 package cn.sdkd.ccse.cise.ces.pojo;
 
+import java.math.BigInteger;
+
 /**
  * Created by sam on 2018/5/18.
  */
@@ -7,6 +9,9 @@ public class SimilarityPair implements Comparable<SimilarityPair> {
     String name1;
     String name2;
     Double similarity;
+
+    BigInteger simhash1;
+    BigInteger simhash2;
 
     public SimilarityPair(String name1, String name2, Double similarity) {
         this.name1 = name1;
@@ -36,6 +41,22 @@ public class SimilarityPair implements Comparable<SimilarityPair> {
 
     public void setSimilarity(Double similarity) {
         this.similarity = similarity;
+    }
+
+    public BigInteger getSimhash1() {
+        return simhash1;
+    }
+
+    public void setSimhash1(BigInteger simhash1) {
+        this.simhash1 = simhash1;
+    }
+
+    public BigInteger getSimhash2() {
+        return simhash2;
+    }
+
+    public void setSimhash2(BigInteger simhash2) {
+        this.simhash2 = simhash2;
     }
 
     /**

@@ -68,6 +68,8 @@ public class SimHashSimilarityService extends SimilarityService {
                         name2 = key;
                     }
                     SimilarityPair sp = new SimilarityPair(name1, name2, sm.getSimilarity().get(j));
+                    sp.setSimhash1(simHashs.get(name1).getStrSimHash());
+                    sp.setSimhash2(simHashs.get(name2).getStrSimHash());
                     r.add(sp);
                 }
             }
