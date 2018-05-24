@@ -1,5 +1,5 @@
 # CheckExperimentSimilarity
-检查实验报告内容的相似度。
+检查实验报告内容的相似度
 =====
 实验报告以word文档形式存在，doc或docx为扩展名。 使用simhash算法检测。
 
