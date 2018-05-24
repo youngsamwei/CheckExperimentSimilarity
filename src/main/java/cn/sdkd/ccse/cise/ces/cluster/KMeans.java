@@ -1,7 +1,10 @@
 package cn.sdkd.ccse.cise.ces.cluster;
 
-import java.util.ArrayList;
-import java.util.Random;
+import cn.sdkd.ccse.cise.ces.pojo.Doc;
+import cn.sdkd.ccse.cise.ces.similarity.SimHash;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * K均值聚类算法
@@ -10,9 +13,10 @@ public class KMeans {
     private int k;// 分成多少簇
     private int m;// 迭代次数
     private int dataSetLength;// 数据集元素个数，即数据集的长度
-    private ArrayList<float[]> dataSet;// 数据集链表
-    private ArrayList<float[]> center;// 中心链表
-    private ArrayList<ArrayList<float[]>> cluster; // 簇
+    private List<Doc> dataSet;// 数据集链表
+    private ArrayList<Doc> center;// 中心链表
+    private Map<String, Map<String, Double>> sim;// 相似度矩阵
+    private ArrayList<ArrayList<Doc>> cluster; // 簇
     private ArrayList<Float> jc;// 误差平方和，k越接近dataSetLength，误差越小
     private Random random;
 
@@ -22,8 +26,35 @@ public class KMeans {
      * @param dataSet
      */
 
-    public void setDataSet(ArrayList<float[]> dataSet) {
+    public void setDataSet(List<Doc> dataSet) {
         this.dataSet = dataSet;
+
+        initSim();
+    }
+
+    /**
+     * 计算任意doc间的相似度
+     *
+     */
+    private void initSim() {
+
+        for (int i = 0; i < dataSet.size(); i++) {
+            Doc doc1 = dataSet.get(i);
+            Map<String, Double> map = sim.get(doc1.getId());
+            if (map == null) {
+                map = new HashMap<String, Double>();
+            }
+            for (int j = 0; j < dataSet.size(); j++) {
+
+                Doc doc2 = dataSet.get(j);
+                Double s = 0.0;
+                if (i!=j){
+                    s = SimHash.gtSemblance(doc1.getSimhashFigerints(), doc2.getSimhashFigerints());
+                }
+                map.put(doc2.getId(), s);
+            }
+            sim.put(doc1.getId(), map);
+        }
     }
 
     /**
@@ -32,7 +63,7 @@ public class KMeans {
      * @return 结果集
      */
 
-    public ArrayList<ArrayList<float[]>> getCluster() {
+    public ArrayList<ArrayList<Doc>> getCluster() {
         return cluster;
     }
 
@@ -42,6 +73,8 @@ public class KMeans {
      * @param k 簇数量,若k<=0时，设置为1，若k大于数据源的长度时，置为数据源的长度
      */
     public KMeans(int k) {
+        sim = new HashMap<String, Map<String, Double>>();
+
         if (k <= 0) {
             k = 1;
         }
@@ -54,9 +87,7 @@ public class KMeans {
     private void init() {
         m = 0;
         random = new Random();
-        if (dataSet == null || dataSet.size() == 0) {
-            initDataSet();
-        }
+
         dataSetLength = dataSet.size();
         if (k > dataSetLength) {
             k = dataSetLength;
@@ -67,27 +98,12 @@ public class KMeans {
     }
 
     /**
-     * 如果调用者未初始化数据集，则采用内部测试数据集
-     */
-    private void initDataSet() {
-        dataSet = new ArrayList<float[]>();
-        // 其中{6,3}是一样的，所以长度为15的数据集分成14簇和15簇的误差都为0
-        float[][] dataSetArray = new float[][]{{8, 2}, {3, 4}, {2, 5},
-                {4, 2}, {7, 3}, {6, 2}, {4, 7}, {6, 3}, {5, 3},
-                {6, 3}, {6, 9}, {1, 6}, {3, 9}, {4, 1}, {8, 6}};
-
-        for (int i = 0; i < dataSetArray.length; i++) {
-            dataSet.add(dataSetArray[i]);
-        }
-    }
-
-    /**
      * 初始化中心数据链表，分成多少簇就有多少个中心点
      *
      * @return 中心点集
      */
-    private ArrayList<float[]> initCenters() {
-        ArrayList<float[]> center = new ArrayList<float[]>();
+    private ArrayList<Doc> initCenters() {
+        ArrayList<Doc> center = new ArrayList<Doc>();
         int[] randoms = new int[k];
         boolean flag;
         int temp = random.nextInt(dataSetLength);
@@ -97,14 +113,7 @@ public class KMeans {
             while (flag) {
                 temp = random.nextInt(dataSetLength);
                 int j = 0;
-                // 不清楚for循环导致j无法加1
-                // for(j=0;j<i;++j)
-                // {
-                // if(temp==randoms[j]);
-                // {
-                // break;
-                // }
-                // }
+
                 while (j < i) {
                     if (temp == randoms[j]) {
                         break;
@@ -118,13 +127,6 @@ public class KMeans {
             randoms[i] = temp;
         }
 
-        // 测试随机数生成情况
-        // for(int i=0;i<k;i++)
-        // {
-        // System.out.println("test1:randoms["+i+"]="+randoms[i]);
-        // }
-
-        // System.out.println();
         for (int i = 0; i < k; i++) {
             center.add(dataSet.get(randoms[i]));// 生成初始化中心链表
         }
@@ -136,30 +138,27 @@ public class KMeans {
      *
      * @return 一个分为k簇的空数据的簇集合
      */
-    private ArrayList<ArrayList<float[]>> initCluster() {
-        ArrayList<ArrayList<float[]>> cluster = new ArrayList<ArrayList<float[]>>();
+    private ArrayList<ArrayList<Doc>> initCluster() {
+        ArrayList<ArrayList<Doc>> cluster = new ArrayList<ArrayList<Doc>>();
         for (int i = 0; i < k; i++) {
-            cluster.add(new ArrayList<float[]>());
+            cluster.add(new ArrayList<Doc>());
         }
 
         return cluster;
     }
 
     /**
-     * 计算两个点之间的距离
+     * 从sim中获取doc间的相似度，再计算doc之间的距离
      *
      * @param element 点1
      * @param center  点2
      * @return 距离
      */
-    private float distance(float[] element, float[] center) {
-        float distance = 0.0f;
-        float x = element[0] - center[0];
-        float y = element[1] - center[1];
-        float z = x * x + y * y;
-        distance = (float) Math.sqrt(z);
+    private double distance(Doc element, Doc center) {
+        Map<String, Double> m = sim.get(element.getId());
+        Double d = m.get(center.getId());
 
-        return distance;
+        return 1 -d;
     }
 
     /**
@@ -168,8 +167,8 @@ public class KMeans {
      * @param distance 距离数组
      * @return 最小距离在距离数组中的位置
      */
-    private int minDistance(float[] distance) {
-        float minDistance = distance[0];
+    private int minDistance(double[] distance) {
+        double minDistance = distance[0];
         int minLocation = 0;
         for (int i = 1; i < distance.length; i++) {
             if (distance[i] < minDistance) {
@@ -190,7 +189,7 @@ public class KMeans {
      * 核心，将当前元素放到最小距离中心相关的簇中
      */
     private void clusterSet() {
-        float[] distance = new float[k];
+        double[] distance = new double[k];
         for (int i = 0; i < dataSetLength; i++) {
             for (int j = 0; j < k; j++) {
                 distance[j] = distance(dataSet.get(i), center.get(j));
@@ -213,13 +212,9 @@ public class KMeans {
      * @param center  点2
      * @return 误差平方
      */
-    private float errorSquare(float[] element, float[] center) {
-        float x = element[0] - center[0];
-        float y = element[1] - center[1];
-
-        float errSquare = x * x + y * y;
-
-        return errSquare;
+    private double errorSquare(Doc element, Doc center) {
+        double v = distance(element, center);
+        return v * v;
     }
 
     /**
@@ -237,61 +232,49 @@ public class KMeans {
     }
 
     /**
-     * 设置新的簇中心方法
+     * 选取簇中离所有点平均距离最小的那个doc为中心
      */
     private void setNewCenter() {
         for (int i = 0; i < k; i++) {
             int n = cluster.get(i).size();
             if (n != 0) {
-                float[] newCenter = {0, 0};
+
+                List<Doc> c = cluster.get(i);
+                Doc newCenter = c.get(0);
+                /*最小平均距离*/
+                Double mind = Double.MAX_VALUE;
+                /*平均距离*/
+                Double md = 0.0;
                 for (int j = 0; j < n; j++) {
-                    newCenter[0] += cluster.get(i).get(j)[0];
-                    newCenter[1] += cluster.get(i).get(j)[1];
+                    Map<String, Double > map = sim.get(c.get(j).getId());
+                    for (int k = 0; k < c.size();k++) {
+                        Double d = map.get(c.get(k).getId());
+                        md += (1 - d);
+                    }
+                    md = md / c.size();
+                    if (md < mind){
+                        newCenter = c.get(j);
+                        mind = md;
+                    }
                 }
-                // 设置一个平均值
-                newCenter[0] = newCenter[0] / n;
-                newCenter[1] = newCenter[1] / n;
+
                 center.set(i, newCenter);
             }
         }
     }
 
     /**
-     * 打印数据，测试用
-     *
-     * @param dataArray     数据集
-     * @param dataArrayName 数据集名称
-     */
-    public void printDataArray(ArrayList<float[]> dataArray,
-                               String dataArrayName) {
-        for (int i = 0; i < dataArray.size(); i++) {
-            System.out.println("print:" + dataArrayName + "[" + i + "]={"
-                    + dataArray.get(i)[0] + "," + dataArray.get(i)[1] + "}");
-        }
-        System.out.println("===================================");
-    }
-
-    /**
      * Kmeans算法核心过程方法
      */
-    private void kmeans() {
+    public void kmeans() {
         init();
-        // printDataArray(dataSet,"initDataSet");
-        // printDataArray(center,"initCenter");
 
         // 循环分组，直到误差不变为止
         while (true) {
             clusterSet();
-            // for(int i=0;i<cluster.size();i++)
-            // {
-            // printDataArray(cluster.get(i),"cluster["+i+"]");
-            // }
 
             countRule();
 
-            // System.out.println("count:"+"jc["+m+"]="+jc.get(m));
-
-            // System.out.println();
             // 误差不变了，分组完成
             if (m != 0) {
                 if (jc.get(m) - jc.get(m - 1) == 0) {
@@ -300,27 +283,12 @@ public class KMeans {
             }
 
             setNewCenter();
-            // printDataArray(center,"newCenter");
+
             m++;
             cluster.clear();
             cluster = initCluster();
         }
 
-        // System.out.println("note:the times of repeat:m="+m);//输出迭代次数
     }
 
-    /**
-     * 执行算法
-     */
-    public void execute() {
-        long startTime = System.currentTimeMillis();
-        System.out.println("kmeans begins");
-        kmeans();
-        long endTime = System.currentTimeMillis();
-        System.out.println("kmeans running time=" + (endTime - startTime)
-                + "ms");
-        System.out.println("kmeans ends");
-        System.out.println();
-    }
 }
-

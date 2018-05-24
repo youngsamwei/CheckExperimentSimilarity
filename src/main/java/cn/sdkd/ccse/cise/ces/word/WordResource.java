@@ -38,13 +38,8 @@ public class WordResource implements Resource {
              WordExtractor word = new WordExtractor(stream);  
              wordText = word.getText();             
 		}		
-//		wordText = clearNoMeanWords(wordText);
-		//加上作者
-//		System.out.println(Thread.currentThread().getName()+" "+wordFilePath);
-//		String [] tmps=wordFilePath.split("\\"+File.separator);
-//		String author = tmps[tmps.length-1].split("\\.")[0];
 
-		return file.getName()+"#_#"+wordText;
+		return wordText;
 	}
 
 	/**

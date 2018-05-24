@@ -103,7 +103,6 @@ public class SimHashSimilarityService extends SimilarityService {
 
     public Similarity analyse(List<HashMap<String, ArrayList<String>>> list, HashMap<String, ArrayList<String>> currentStu) {
         Similarity resOne = new Similarity();//与其他人的重复率比较
-        //设置当前学生的姓名
         String currentKey = getFirstKey(currentStu);
         resOne.setId(currentKey);
         SimHash simHash = simHashs.get(currentKey);

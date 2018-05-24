@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -50,6 +52,43 @@ public class ServiceFacade {
                 HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>> ();
                 try {
                     String content = pdf.readPDFText(files[i].getAbsolutePath());
+
+                    WordSegService ss = new WordSegService();
+                    map = ss.getAnalysis(content, name);
+                    resList.add(map);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            } else {
+                logger.error("不支持的文件类型 : " + name);
+                continue;
+            }
+
+        }
+    }
+    public void singleThreadHandleWords(Map<String, File> files, ArrayList<HashMap<String, ArrayList<String>>> resList) {
+        Iterator<String> it = files.keySet().iterator();
+        while(it.hasNext()){
+
+            //先获取word文档的内容
+            //开启多线程，获取文字
+            String name = it.next();
+            File f = files.get(name);
+            if (name.endsWith(".doc") || name.endsWith(".docx")) {
+                WordResource wr = new WordResource();
+                try {
+                    String text = wr.getText(f.getAbsolutePath());
+                    WordSegService ss = new WordSegService();
+                    HashMap<String, ArrayList<String>> map = ss.getAnalysis(text, name);
+                    resList.add(map);
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            } else if (name.endsWith(".pdf")) {
+                PDF pdf = new PDF();
+                HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>> ();
+                try {
+                    String content = pdf.readPDFText(f.getAbsolutePath());
 
                     WordSegService ss = new WordSegService();
                     map = ss.getAnalysis(content, name);

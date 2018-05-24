@@ -4,19 +4,18 @@ import cn.sdkd.ccse.cise.ces.pojo.Doc;
 import cn.sdkd.ccse.cise.ces.pojo.DocCluster;
 import cn.sdkd.ccse.cise.ces.similarity.SimHash;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
- * 通过minhash方法进行聚类
+ * 先使用simhash计算指纹，再使用层次聚类
  *
- * @author 丁杰
+ * @author sam
  */
 public class HierarchicalCluster {
 
