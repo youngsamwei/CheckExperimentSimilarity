@@ -4,11 +4,12 @@
 实验报告以word文档形式存在，doc或docx为扩展名。 使用simhash算法检测。
 
 #### 程序入口
-#### cn.sdkd.ccse.cise.ces.Main
+<p> cn.sdkd.ccse.cise.ces.Main</p>
 
-#### 使用hanlp分词。
-#### 采用单线程和多线程两种方式运行，默认采用单线程方式运行。
-#### 多线程方式借鉴jay-bill/check-similarity
+
+<p> 使用hanlp分词。</p>
+<p> 采用单线程和多线程两种方式运行，默认采用单线程方式运行。</p>
+<p> 多线程方式借鉴jay-bill/check-similarity</p>
 
 
 <p>2018-05-24 处理从蓝墨云班课中导出的文件夹，每个文件夹对应一个学生，一个文件夹中可能有多个提交文档</p>
