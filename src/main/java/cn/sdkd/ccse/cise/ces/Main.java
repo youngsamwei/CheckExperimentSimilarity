@@ -161,6 +161,7 @@ public class Main {
     public static void main(String[] args) {
         String path = "E:\\IntelliJ_IDEA_workspace\\check-similarity\\src\\main\\webapp\\files\\ThuMay17100709CST2018";
         path = "G:\\360云盘工作目录\\计算机同步文件夹\\工作目录\\教学\\数据库设计\\计算机15数据库设计实验\\实验0 数据库任务陈述与系统定义";
+        //下面的路径指向从蓝墨云班课中导出的文件夹，每个文件夹对应一个学生。
         path = "G:\\360云盘工作目录\\计算机同步文件夹\\工作目录\\教学\\数据库设计\\计算机15数据库设计实验\\计算机15-1,2,3-数据库设计-实验1 逻辑数据库设计-ER模型设计";
         byte type = 2;
 
